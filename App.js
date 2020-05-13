@@ -1,35 +1,53 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, ImageBackground } from 'react-native';
 import Constants from 'expo-constants'
-import {Megnetometer, Magnetometer} from 'expo-sensors'
+import {Magnetometer, DeviceMotion} from 'expo-sensors'
 
 export default class App extends React.Component {
   state = { isReady: false }
 
-  _setupMagnetometerAsync = async () => {
-    Magnetometer.addListener( vector => {
-      this.setState({vector})
+  // compass
+  // _setupMagnetometerAsync = async () => {
+  //   Magnetometer.addListener( vector => {
+  //     this.setState({vector})
+  //   })
+  // }
+
+  _setupDeviceMotionAsync = async () => {
+    DeviceMotion.addListener( dm => {
+      // console.log(dm.rotation)
+      this.setState({dm})
     })
+    DeviceMotion.setUpdateInterval(16)
   }
   componentDidMount() {
-    this._setupMagnetometerAsync()
+    // this._setupMagnetometerAsync()
+    this._setupDeviceMotionAsync()
   }
   render() {
-    let theta = "0rad"
-    if (this.state.vector) {
-      let {x,y,z} = this.state.vector
-      theta = Math.atan(-x/y)
-      if (-x > 0 && y > 0) {
+    // Compass
+    // let theta = "0rad"
+    // if (this.state.vector) {
+    //   let {x,y,z} = this.state.vector
+    //   theta = Math.atan(-x/y)
+    //   if (-x > 0 && y > 0) {
 
-      } else if (y > 0) {
-        theta += Math.PI
-      } else {
-        theta += Math.PI * 2
-      }
+    //   } else if (y > 0) {
+    //     theta += Math.PI
+    //   } else {
+    //     theta += Math.PI * 2
+    //   }
+    // }
+
+    // DeviceMotion
+    let angle = 0
+    if (this.state.dm && this.state.dm.rotation) {
+      angle = -this.state.dm.rotation.gamma
     }
     return (
       <View style={styles.container}>
-        <Text>{JSON.stringify(theta)}</Text>
+        {/* Compass */}
+        {/* <Text>{JSON.stringify(theta)}</Text>
         <ImageBackground 
           source={require('./images/CompassFace.png')}
           style={{
@@ -48,7 +66,17 @@ export default class App extends React.Component {
               transform: [{rotate: theta + 'rad'}]
             }}
           />
-        </ImageBackground>
+        </ImageBackground> */}
+
+        {/*  */}
+        <Image
+          source={require('./images/UpHouse.jpg')}
+          style={{
+            height: 600,
+            width: 500,
+            transform: [{rotate: angle + 'rad'}]
+          }}
+        />
       </View>
     );
   }
